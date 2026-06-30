@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { sitePath } from "../../lib/site-paths";
 
 const notes = (await getCollection("notes")).filter((entry) => !entry.data.draft);
 const groups = Object.values(
@@ -28,7 +29,7 @@ const groups = Object.values(
 
   <section class="cards">
     {groups.map((group) => (
-      <a class="panel card" href={`/categories/${group.slug}/`}>
+      <a class="panel card" href={sitePath(`categories/${group.slug}/`)}>
         <strong>{group.label}</strong>
         <span>{group.count} 篇笔记</span>
       </a>

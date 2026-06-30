@@ -1,4 +1,6 @@
 ---
+import { sitePath } from "../lib/site-paths";
+
 interface Props {
   href: string;
   title: string;
@@ -19,7 +21,7 @@ const { href, title, summary, categoryLabel, updated, tags } = Astro.props;
   <h2><a href={href}>{title}</a></h2>
   <p>{summary}</p>
   <div class="tags">
-    {tags.map((tag) => <a href={`/tags/${tag}/`}>#{tag}</a>)}
+    {tags.map((tag) => <a href={sitePath(`tags/${tag}/`)}>#{tag}</a>)}
   </div>
 </article>
 

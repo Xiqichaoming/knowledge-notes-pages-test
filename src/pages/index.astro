@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NoteCard from "../components/NoteCard.astro";
+import { sitePath } from "../lib/site-paths";
 
 const notes = (await getCollection("notes"))
   .filter((entry) => !entry.data.draft)
@@ -39,12 +40,12 @@ const categories = [...new Set(notes.map((entry) => entry.data.category))];
   <section class="panel section">
     <div class="section-head">
       <h2>最近发布</h2>
-      <a href="/notes/">查看全部</a>
+      <a href={sitePath("notes/")}>查看全部</a>
     </div>
     <div class="grid">
       {recentNotes.map((note) => (
         <NoteCard
-          href={`/notes/${note.slug}/`}
+          href={sitePath(`notes/${note.slug}/`)}
           title={note.data.title}
           summary={note.data.summary}
           categoryLabel={note.data.categoryLabel}

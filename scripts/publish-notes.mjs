@@ -6,6 +6,7 @@ const workspaceRoot = "D:/Desktop/CodeProjects/Notes";
 const sourceRoot = path.join(workspaceRoot, "知识仓库");
 const publishRoot = path.join(workspaceRoot, "notes-publish");
 const siteRoot = path.join(workspaceRoot, "notes-site");
+const publicBase = "/knowledge-notes-pages-test";
 const configPath = path.join(publishRoot, "manifest", "publish.config.json");
 const publishNotesDir = path.join(publishRoot, "notes");
 const publishAssetsDir = path.join(publishRoot, "assets");
@@ -92,8 +93,11 @@ const normalizeBody = async (body, noteDir, linkLookup, missingRefs) => {
       output = output.replace(match[0], `![Missing asset: ${fileName}]()`);
       continue;
     }
-    const publicPath = await copyAsset(assetPath, fileName);
-    output = output.replace(match[0], `![${fileName}](${publicPath})`);
+    await copyAsset(assetPath, fileName);
+    output = output.replace(
+      match[0],
+      `![${fileName}](${publicBase}/assets/${encodeURIComponent(fileName)})`
+    );
   }
 
   output = output.replace(wikiLinkPattern, (_, target, anchor, label) => {
@@ -105,7 +109,7 @@ const normalizeBody = async (body, noteDir, linkLookup, missingRefs) => {
       return linkLabel;
     }
     const hash = anchor ? `#${slugify(anchor)}` : "";
-    return `[${linkLabel}](/notes/${targetSlug}/${hash})`;
+    return `[${linkLabel}](${publicBase}/notes/${targetSlug}/${hash})`;
   });
 
   return output;

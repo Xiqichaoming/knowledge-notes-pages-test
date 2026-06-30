@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { sitePath } from "../../lib/site-paths";
 
 const notes = (await getCollection("notes")).filter((entry) => !entry.data.draft);
 const tagMap = new Map();
@@ -23,7 +24,7 @@ const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 
   <section class="panel section tag-cloud">
     {tags.map(([tag, count]) => (
-      <a href={`/tags/${tag}/`} class="tag">
+      <a href={sitePath(`tags/${tag}/`)} class="tag">
         <strong>#{tag}</strong>
         <span>{count}</span>
       </a>
