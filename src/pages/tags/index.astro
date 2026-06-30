@@ -1,0 +1,54 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const notes = (await getCollection("notes")).filter((entry) => !entry.data.draft);
+const tagMap = new Map();
+
+for (const note of notes) {
+  for (const tag of note.data.tags) {
+    tagMap.set(tag, (tagMap.get(tag) ?? 0) + 1);
+  }
+}
+
+const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+---
+
+<BaseLayout title="标签">
+  <section class="panel section">
+    <span class="eyebrow">Tags</span>
+    <h1 class="hero-title">按标签浏览</h1>
+    <p class="hero-copy">标签先服务于筛选和聚合，不追求过细分类。</p>
+  </section>
+
+  <section class="panel section tag-cloud">
+    {tags.map(([tag, count]) => (
+      <a href={`/tags/${tag}/`} class="tag">
+        <strong>#{tag}</strong>
+        <span>{count}</span>
+      </a>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(15, 118, 110, 0.09);
+    color: #0f766e;
+  }
+
+  .tag span {
+    color: #5f534a;
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  categoryLabel: string;
+  updated: string;
+  tags: string[];
+}
+
+const { href, title, summary, categoryLabel, updated, tags } = Astro.props;
+---
+
+<article class="card">
+  <div class="meta">
+    <span>{categoryLabel}</span>
+    <time datetime={updated}>{updated}</time>
+  </div>
+  <h2><a href={href}>{title}</a></h2>
+  <p>{summary}</p>
+  <div class="tags">
+    {tags.map((tag) => <a href={`/tags/${tag}/`}>#{tag}</a>)}
+  </div>
+</article>
+
+<style>
+  .card {
+    display: grid;
+    gap: 14px;
+    padding: 22px;
+    background: rgba(255, 252, 247, 0.92);
+    border: 1px solid rgba(31, 26, 23, 0.08);
+    border-radius: 18px;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(15, 118, 110, 0.25);
+    box-shadow: 0 18px 36px rgba(28, 17, 10, 0.08);
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: #72655b;
+    font-size: 0.86rem;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  h2 a:hover {
+    color: #0f766e;
+  }
+
+  p {
+    margin: 0;
+    color: #4c423a;
+    line-height: 1.65;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .tags a {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(15, 118, 110, 0.09);
+    color: #0f766e;
+    font-size: 0.84rem;
+  }
+</style>

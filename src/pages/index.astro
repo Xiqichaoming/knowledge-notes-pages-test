@@ -1,0 +1,108 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import NoteCard from "../components/NoteCard.astro";
+
+const notes = (await getCollection("notes"))
+  .filter((entry) => !entry.data.draft)
+  .sort((a, b) => b.data.updated.localeCompare(a.data.updated));
+
+const recentNotes = notes.slice(0, 4);
+const categories = [...new Set(notes.map((entry) => entry.data.category))];
+---
+
+<BaseLayout title="Knowledge Notes" description="公开整理的学习笔记与研究笔记。">
+  <section class="panel section">
+    <span class="eyebrow">Public Layer Online</span>
+    <h1 class="hero-title">先把公开笔记站跑通，再逐步自动化。</h1>
+    <p class="hero-copy">
+      这个站点从私有 Obsidian 知识库里抽取可公开的内容，经过清洗和链接转换后生成静态页面。
+      目前首发内容聚焦在 AI 和 Python 方向，后续会继续扩充。
+    </p>
+  </section>
+
+  <section class="stats">
+    <div class="panel section stat">
+      <strong>{notes.length}</strong>
+      <span>已发布笔记</span>
+    </div>
+    <div class="panel section stat">
+      <strong>{categories.length}</strong>
+      <span>当前分类</span>
+    </div>
+    <div class="panel section stat">
+      <strong>Astro</strong>
+      <span>静态构建</span>
+    </div>
+  </section>
+
+  <section class="panel section">
+    <div class="section-head">
+      <h2>最近发布</h2>
+      <a href="/notes/">查看全部</a>
+    </div>
+    <div class="grid">
+      {recentNotes.map((note) => (
+        <NoteCard
+          href={`/notes/${note.slug}/`}
+          title={note.data.title}
+          summary={note.data.summary}
+          categoryLabel={note.data.categoryLabel}
+          updated={note.data.updated}
+          tags={note.data.tags}
+        />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .stat {
+    display: grid;
+    gap: 8px;
+  }
+
+  .stat strong {
+    font-size: 1.8rem;
+  }
+
+  .stat span {
+    color: #72655b;
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .section-head h2 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .section-head a {
+    color: #0f766e;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  @media (max-width: 860px) {
+    .stats,
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

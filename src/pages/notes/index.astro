@@ -1,0 +1,46 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import NoteCard from "../../components/NoteCard.astro";
+
+const notes = (await getCollection("notes"))
+  .filter((entry) => !entry.data.draft)
+  .sort((a, b) => b.data.updated.localeCompare(a.data.updated));
+---
+
+<BaseLayout title="全部笔记">
+  <section class="panel section">
+    <span class="eyebrow">Archive</span>
+    <h1 class="hero-title">全部公开笔记</h1>
+    <p class="hero-copy">
+      这里收录已经从私有知识库筛选并清洗过的内容。原始写作仍然发生在本地 Obsidian 库中。
+    </p>
+  </section>
+
+  <section class="grid">
+    {notes.map((note) => (
+      <NoteCard
+        href={`/notes/${note.slug}/`}
+        title={note.data.title}
+        summary={note.data.summary}
+        categoryLabel={note.data.categoryLabel}
+        updated={note.data.updated}
+        tags={note.data.tags}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  @media (max-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

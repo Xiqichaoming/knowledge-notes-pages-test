@@ -1,0 +1,51 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import NoteCard from "../../components/NoteCard.astro";
+
+export async function getStaticPaths() {
+  const notes = (await getCollection("notes")).filter((entry) => !entry.data.draft);
+  const tags = [...new Set(notes.flatMap((entry) => entry.data.tags))];
+  return tags.map((tag) => ({ params: { tag } }));
+}
+
+const { tag } = Astro.params;
+const notes = (await getCollection("notes"))
+  .filter((entry) => !entry.data.draft && entry.data.tags.includes(tag))
+  .sort((a, b) => b.data.updated.localeCompare(a.data.updated));
+---
+
+<BaseLayout title={`#${tag}`}>
+  <section class="panel section">
+    <span class="eyebrow">Tag</span>
+    <h1 class="hero-title">#{tag}</h1>
+    <p class="hero-copy">当前标签下共 {notes.length} 篇公开笔记。</p>
+  </section>
+
+  <section class="grid">
+    {notes.map((note) => (
+      <NoteCard
+        href={`/notes/${note.slug}/`}
+        title={note.data.title}
+        summary={note.data.summary}
+        categoryLabel={note.data.categoryLabel}
+        updated={note.data.updated}
+        tags={note.data.tags}
+      />
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  @media (max-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

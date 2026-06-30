@@ -1,0 +1,14 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="About">
+  <section class="panel section">
+    <span class="eyebrow">About</span>
+    <h1 class="hero-title">这个站点怎么来的</h1>
+    <p class="hero-copy">
+      笔记原本写在私有 Obsidian 知识库中。发布时，脚本会抽取允许公开的笔记，
+      处理内部链接和附件，再把结果送进 Astro 站点构建成静态网页。
+    </p>
+  </section>
+</BaseLayout>

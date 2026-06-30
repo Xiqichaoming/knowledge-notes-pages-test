@@ -1,0 +1,65 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const notes = (await getCollection("notes")).filter((entry) => !entry.data.draft);
+const groups = Object.values(
+  notes.reduce((acc, entry) => {
+    const key = entry.data.category;
+    if (!acc[key]) {
+      acc[key] = {
+        slug: key,
+        label: entry.data.categoryLabel,
+        count: 0
+      };
+    }
+    acc[key].count += 1;
+    return acc;
+  }, {})
+);
+---
+
+<BaseLayout title="分类">
+  <section class="panel section">
+    <span class="eyebrow">Categories</span>
+    <h1 class="hero-title">按分类浏览</h1>
+    <p class="hero-copy">先把主要内容按主题收住，后续再扩展到更多方向。</p>
+  </section>
+
+  <section class="cards">
+    {groups.map((group) => (
+      <a class="panel card" href={`/categories/${group.slug}/`}>
+        <strong>{group.label}</strong>
+        <span>{group.count} 篇笔记</span>
+      </a>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    padding: 22px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .card strong {
+    font-size: 1.1rem;
+  }
+
+  .card span {
+    color: #72655b;
+  }
+
+  @media (max-width: 860px) {
+    .cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
