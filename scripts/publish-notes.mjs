@@ -15,6 +15,7 @@ const siteAssetsDir = path.join(siteRoot, "public", "assets");
 
 const imagePattern = /!\[\[([^\]]+)\]\]/g;
 const wikiLinkPattern = /\[\[([^\]|#]+)(?:#([^\]|]+))?(?:\|([^\]]+))?\]\]/g;
+const codeFencePattern = /^```([A-Za-z][A-Za-z0-9#+-]*)([^\n\r]*)$/gm;
 
 const ensureDir = async (dirPath) => {
   await fs.mkdir(dirPath, { recursive: true });
@@ -111,6 +112,8 @@ const normalizeBody = async (body, noteDir, linkLookup, missingRefs) => {
     const hash = anchor ? `#${slugify(anchor)}` : "";
     return `[${linkLabel}](${publicBase}/notes/${targetSlug}/${hash})`;
   });
+
+  output = output.replace(codeFencePattern, (_, language, rest) => `\`\`\`${language.toLowerCase()}${rest}`);
 
   return output;
 };

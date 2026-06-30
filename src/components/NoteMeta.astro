@@ -1,0 +1,15 @@
+---
+interface Props {
+  updated: string;
+  readingTime?: string;
+  source: string;
+}
+
+const { updated, readingTime, source } = Astro.props;
+---
+
+<div class="meta-line">
+  <span>更新于 {updated}</span>
+  {readingTime && <span>{readingTime}</span>}
+  <span>{source}</span>
+</div>

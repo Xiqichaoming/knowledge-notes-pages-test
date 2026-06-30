@@ -11,72 +11,86 @@ interface Props {
 }
 
 const { href, title, summary, categoryLabel, updated, tags } = Astro.props;
+const visibleTags = tags.slice(0, 3);
 ---
 
-<article class="card">
-  <div class="meta">
-    <span>{categoryLabel}</span>
+<article class="note-card">
+  <div class="note-card-meta">
+    <span class="note-card-category">{categoryLabel}</span>
     <time datetime={updated}>{updated}</time>
   </div>
-  <h2><a href={href}>{title}</a></h2>
-  <p>{summary}</p>
-  <div class="tags">
-    {tags.map((tag) => <a href={sitePath(`tags/${tag}/`)}>#{tag}</a>)}
-  </div>
+  <h2 class="note-card-title">
+    <a href={href}>{title}</a>
+  </h2>
+  <p class="note-card-summary">{summary}</p>
+  {visibleTags.length > 0 && (
+    <div class="note-card-tags">
+      {visibleTags.map((tag) => (
+        <a href={sitePath(`tags/${tag}/`)}>#{tag}</a>
+      ))}
+    </div>
+  )}
 </article>
 
 <style>
-  .card {
+  .note-card {
     display: grid;
     gap: 14px;
-    padding: 22px;
-    background: rgba(255, 252, 247, 0.92);
-    border: 1px solid rgba(31, 26, 23, 0.08);
-    border-radius: 18px;
+    padding: 20px;
+    background: rgba(255, 253, 250, 0.9);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
   }
 
-  .card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(15, 118, 110, 0.25);
-    box-shadow: 0 18px 36px rgba(28, 17, 10, 0.08);
+  .note-card:hover {
+    transform: translateY(-1px);
+    border-color: var(--accent-line);
+    box-shadow: var(--shadow-soft);
   }
 
-  .meta {
+  .note-card-meta {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     gap: 12px;
-    color: #72655b;
+    color: var(--text-muted);
     font-size: 0.86rem;
   }
 
-  h2 {
+  .note-card-category {
+    color: var(--accent);
+  }
+
+  .note-card-title {
     margin: 0;
-    font-size: 1.25rem;
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    font-weight: 600;
     line-height: 1.25;
   }
 
-  h2 a:hover {
+  .note-card-title a:hover {
     color: #0f766e;
   }
 
-  p {
+  .note-card-summary {
     margin: 0;
-    color: #4c423a;
+    color: var(--text-soft);
     line-height: 1.65;
   }
 
-  .tags {
+  .note-card-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
   }
 
-  .tags a {
+  .note-card-tags a {
     padding: 6px 10px;
     border-radius: 999px;
-    background: rgba(15, 118, 110, 0.09);
-    color: #0f766e;
+    background: var(--accent-soft);
+    color: var(--accent);
     font-size: 0.84rem;
   }
 </style>

@@ -1,55 +1,145 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SectionIntro from "../../components/SectionIntro.astro";
+import { groupNotesByCategory, groupNotesByTag, sortNotes } from "../../lib/notes";
 import { sitePath } from "../../lib/site-paths";
 
-const notes = (await getCollection("notes")).filter((entry) => !entry.data.draft);
-const tagMap = new Map();
-
-for (const note of notes) {
-  for (const tag of note.data.tags) {
-    tagMap.set(tag, (tagMap.get(tag) ?? 0) + 1);
-  }
-}
-
-const tags = [...tagMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+const notes = sortNotes((await getCollection("notes")).filter((entry) => !entry.data.draft));
+const categories = groupNotesByCategory(notes);
+const tags = [...groupNotesByTag(notes)].sort(
+  (left, right) => right.count - left.count || left.label.localeCompare(right.label)
+);
 ---
 
 <BaseLayout title="标签">
-  <section class="panel section">
-    <span class="eyebrow">Tags</span>
-    <h1 class="hero-title">按标签浏览</h1>
-    <p class="hero-copy">标签先服务于筛选和聚合，不追求过细分类。</p>
+  <SectionIntro
+    eyebrow="标签"
+    title="按标签聚合"
+    copy="标签主要服务于检索和横向串联。它们不替代分类结构，而是帮助你在不同专题之间找到相互指向的内容。"
+  />
+
+  <section class="overview-grid">
+    <article class="surface-muted section-tight stat-card">
+      <span class="stat-label">标签数量</span>
+      <strong class="stat-value">{tags.length}</strong>
+    </article>
+    <article class="surface-muted section-tight stat-card">
+      <span class="stat-label">覆盖分类</span>
+      <strong class="stat-value">{categories.length}</strong>
+    </article>
+    <article class="surface-muted section-tight stat-card">
+      <span class="stat-label">公开笔记</span>
+      <strong class="stat-value">{notes.length}</strong>
+    </article>
   </section>
 
-  <section class="panel section tag-cloud">
-    {tags.map(([tag, count]) => (
-      <a href={sitePath(`tags/${tag}/`)} class="tag">
-        <strong>#{tag}</strong>
-        <span>{count}</span>
-      </a>
-    ))}
+  <section class="surface section">
+    <div class="section-head">
+      <h2>标签目录</h2>
+      <span class="section-summary">{tags.length} 个标签</span>
+    </div>
+
+    <div class="tag-grid">
+      {tags.map((tag) => {
+        const latestNote = tag.notes[0];
+        const categoryCount = new Set(tag.notes.map((note) => note.data.category)).size;
+
+        return (
+          <a href={sitePath(`tags/${tag.slug}/`)} class="tag-card">
+            <div class="tag-card-meta">
+              <span>{tag.count} 篇笔记</span>
+              <span>{categoryCount} 个分类</span>
+            </div>
+            <strong>#{tag.label}</strong>
+            <p>{latestNote?.data.summary ?? "这个标签用于串联相关内容。"} </p>
+            {latestNote && <span class="tag-card-latest">最近出现于《{latestNote.data.title}》</span>}
+          </a>
+        );
+      })}
+    </div>
   </section>
 </BaseLayout>
 
 <style>
-  .tag-cloud {
-    display: flex;
-    flex-wrap: wrap;
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
   }
 
-  .tag {
-    display: inline-flex;
-    align-items: center;
+  .stat-card {
+    display: grid;
     gap: 10px;
-    padding: 10px 14px;
-    border-radius: 999px;
-    background: rgba(15, 118, 110, 0.09);
-    color: #0f766e;
+    min-height: 104px;
+    align-content: space-between;
   }
 
-  .tag span {
-    color: #5f534a;
+  .stat-label,
+  .section-summary {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    letter-spacing: 0.04em;
+  }
+
+  .stat-value {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .tag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .tag-card {
+    display: grid;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255, 249, 242, 0.78);
+  }
+
+  .tag-card:hover {
+    border-color: var(--accent-line);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .tag-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 0.84rem;
+  }
+
+  .tag-card strong {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .tag-card p {
+    margin: 0;
+    color: var(--text-soft);
+    line-height: 1.7;
+    text-wrap: pretty;
+  }
+
+  .tag-card-latest {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+  }
+
+  @media (max-width: 960px) {
+    .overview-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

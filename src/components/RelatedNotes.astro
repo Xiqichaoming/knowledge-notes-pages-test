@@ -1,0 +1,73 @@
+---
+import type { NoteEntry } from "../lib/notes";
+import { sitePath } from "../lib/site-paths";
+
+interface Props {
+  notes: NoteEntry[];
+}
+
+const { notes } = Astro.props;
+---
+
+{notes.length > 0 && (
+  <section class="surface section-tight">
+    <div class="section-head related-head">
+      <h2>继续阅读</h2>
+    </div>
+    <div class="related-list">
+      {notes.map((note) => (
+        <article class="related-item">
+          <span>{note.data.categoryLabel}</span>
+          <a href={sitePath(`notes/${note.slug}/`)}>
+            <strong>{note.data.title}</strong>
+          </a>
+          <p>{note.data.summary}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-head {
+    margin-bottom: 14px;
+  }
+
+  .related-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .related-item {
+    display: grid;
+    gap: 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .related-item:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .related-item span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .related-item strong {
+    font-family: var(--font-serif);
+    font-size: 1.08rem;
+    font-weight: 600;
+  }
+
+  .related-item a:hover {
+    color: var(--accent);
+  }
+
+  .related-item p {
+    margin: 0;
+    color: var(--text-soft);
+    line-height: 1.65;
+  }
+</style>

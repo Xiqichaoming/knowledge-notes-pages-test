@@ -1,0 +1,238 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--page-bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(circle at top left, var(--page-glow-b), transparent 28%),
+    radial-gradient(circle at top right, var(--page-glow-a), transparent 26%),
+    var(--page-bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.shell {
+  width: min(var(--content-width), calc(100% - clamp(20px, 4vw, 64px)));
+  margin: 0 auto;
+  padding: 20px 0 48px;
+}
+
+.shell-reading {
+  width: min(1440px, calc(100% - clamp(20px, 4vw, 72px)));
+}
+
+.site-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 14px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 252, 248, 0.78);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-soft);
+}
+
+.site-brand {
+  display: grid;
+  gap: 4px;
+}
+
+.site-brand strong {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.site-brand span {
+  color: var(--text-muted);
+  font-size: 0.93rem;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.site-nav a {
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: var(--text-soft);
+}
+
+.site-nav a:hover,
+.site-nav a[aria-current="page"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.page-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, var(--sidebar-width)) minmax(0, 1fr);
+  gap: clamp(20px, 2.4vw, 34px);
+  align-items: start;
+  margin-top: 24px;
+}
+
+.page-grid-reading {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.page-main {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 24px;
+}
+
+.page-main-reading {
+  gap: 20px;
+}
+
+.surface {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+}
+
+.surface-muted {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.section {
+  padding: clamp(20px, 2.3vw, 32px);
+}
+
+.section-tight {
+  padding: clamp(16px, 1.8vw, 22px);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.84rem;
+}
+
+.section-title {
+  margin: 14px 0 0;
+  font-family: var(--font-serif);
+  font-size: 2.45rem;
+  font-weight: 600;
+  line-height: 1.06;
+}
+
+.section-copy {
+  margin: 14px 0 0;
+  max-width: min(100%, 1040px);
+  color: var(--text-soft);
+  font-size: 1rem;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.section-head h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+}
+
+.section-head a {
+  color: var(--accent);
+}
+
+.meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.84rem;
+}
+
+.site-footer {
+  margin-top: 36px;
+  padding-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+@media (max-width: 1040px) {
+  .page-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .shell,
+  .shell-reading {
+    width: calc(100% - 20px);
+    padding-top: 16px;
+  }
+
+  .site-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+}

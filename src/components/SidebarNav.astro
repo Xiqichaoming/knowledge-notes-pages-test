@@ -1,0 +1,163 @@
+---
+import type { CategoryGroup, NoteEntry } from "../lib/notes";
+import { SITE_BASE, sitePath } from "../lib/site-paths";
+
+interface Props {
+  currentPath: string;
+  categories: CategoryGroup[];
+  recentNotes: NoteEntry[];
+}
+
+const { currentPath, categories, recentNotes } = Astro.props;
+
+const isCurrent = (href: string) => {
+  if (href === SITE_BASE) {
+    return currentPath === SITE_BASE || currentPath === SITE_BASE.slice(0, -1);
+  }
+  return currentPath.startsWith(href);
+};
+---
+
+<aside class="sidebar">
+  <section class="surface-muted section-tight sidebar-block">
+    <span class="sidebar-label">导航</span>
+    <nav class="sidebar-nav" aria-label="Primary">
+      <a href={SITE_BASE} aria-current={isCurrent(SITE_BASE) ? "page" : undefined}>首页</a>
+      <a href={sitePath("notes/")} aria-current={isCurrent(sitePath("notes/")) ? "page" : undefined}>
+        全部笔记
+      </a>
+      <a
+        href={sitePath("categories/")}
+        aria-current={isCurrent(sitePath("categories/")) ? "page" : undefined}
+      >
+        分类
+      </a>
+      <a href={sitePath("tags/")} aria-current={isCurrent(sitePath("tags/")) ? "page" : undefined}>
+        标签
+      </a>
+      <a href={sitePath("about/")} aria-current={isCurrent(sitePath("about/")) ? "page" : undefined}>说明</a>
+    </nav>
+  </section>
+
+  <section class="surface-muted section-tight sidebar-block">
+    <div class="sidebar-head">
+      <span class="sidebar-label">专题</span>
+      <a href={sitePath("categories/")}>全部</a>
+    </div>
+    <div class="sidebar-list">
+      {categories.map((category) => (
+        <a class="sidebar-item" href={sitePath(`categories/${category.slug}/`)}>
+          <strong>{category.label}</strong>
+          <span>{category.count}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="surface-muted section-tight sidebar-block">
+    <div class="sidebar-head">
+      <span class="sidebar-label">最近更新</span>
+      <a href={sitePath("notes/")}>归档</a>
+    </div>
+    <div class="sidebar-list">
+      {recentNotes.map((note) => (
+        <a class="sidebar-item sidebar-item-note" href={sitePath(`notes/${note.slug}/`)}>
+          <strong>{note.data.title}</strong>
+          <span>{note.data.updated}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</aside>
+
+<style>
+  .sidebar {
+    display: grid;
+    align-content: start;
+    gap: 16px;
+  }
+
+  .sidebar-block {
+    display: grid;
+    gap: 14px;
+  }
+
+  .sidebar-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .sidebar-head a {
+    color: var(--accent);
+    font-size: 0.84rem;
+  }
+
+  .sidebar-label {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+  }
+
+  .sidebar-nav,
+  .sidebar-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .sidebar-nav a,
+  .sidebar-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+    padding: 10px 12px;
+    border-radius: 14px;
+    color: var(--text-soft);
+  }
+
+  .sidebar-nav a:hover,
+  .sidebar-nav a[aria-current="page"],
+  .sidebar-item:hover {
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--accent);
+  }
+
+  .sidebar-item strong {
+    font-size: 0.94rem;
+    font-weight: 600;
+  }
+
+  .sidebar-item span,
+  .sidebar-nav span {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+
+  .sidebar-item-note {
+    display: grid;
+    align-items: start;
+    justify-content: stretch;
+    gap: 4px;
+  }
+
+  .sidebar-item-note strong {
+    max-width: 100%;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
+    word-break: keep-all;
+  }
+
+  .sidebar-item-note span {
+    justify-self: start;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 1040px) {
+    .sidebar {
+      order: 2;
+    }
+  }
+</style>

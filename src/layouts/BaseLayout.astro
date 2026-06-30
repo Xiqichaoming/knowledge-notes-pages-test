@@ -1,16 +1,33 @@
 ---
 import "katex/dist/katex.min.css";
+import { getCollection } from "astro:content";
+import SidebarNav from "../components/SidebarNav.astro";
+import { sortNotes, groupNotesByCategory } from "../lib/notes";
 import { SITE_BASE, sitePath } from "../lib/site-paths";
+import "../styles/tokens.css";
+import "../styles/base.css";
+import "../styles/prose.css";
 
 interface Props {
   title: string;
   description?: string;
+  layout?: "default" | "reading";
 }
 
 const {
   title,
-  description = "公开整理的学习笔记与研究笔记。"
+  description = "公开整理的学习笔记与研究笔记。",
+  layout = "default"
 } = Astro.props;
+const pageTitle = title === "Knowledge Notes" ? title : `${title} | Knowledge Notes`;
+const isReadingLayout = layout === "reading";
+
+const notes = sortNotes((await getCollection("notes")).filter((entry) => !entry.data.draft));
+const categories = groupNotesByCategory(notes);
+const recentNotes = notes.slice(0, 5);
+const currentPath = Astro.url.pathname;
+const isCurrent = (href: string) =>
+  href === SITE_BASE ? currentPath === SITE_BASE || currentPath === SITE_BASE.slice(0, -1) : currentPath.startsWith(href);
 ---
 
 <!doctype html>
@@ -18,188 +35,42 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
+    <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <style>
-      :root {
-        color-scheme: light;
-        --bg: #f4efe8;
-        --panel: rgba(255, 250, 244, 0.9);
-        --panel-strong: #fffdf9;
-        --text: #1f1a17;
-        --muted: #72655b;
-        --accent: #0f766e;
-        --accent-soft: rgba(15, 118, 110, 0.12);
-        --border: rgba(31, 26, 23, 0.1);
-        --shadow: 0 18px 40px rgba(55, 38, 22, 0.08);
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
-        color: var(--text);
-        background:
-          radial-gradient(circle at top left, rgba(15, 118, 110, 0.1), transparent 28%),
-          radial-gradient(circle at top right, rgba(180, 83, 9, 0.1), transparent 26%),
-          var(--bg);
-        min-height: 100vh;
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .page :global(.katex-display) {
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 0.6rem 0;
-      }
-
-      .page :global(.katex) {
-        font-size: 1.05em;
-      }
-
-      .shell {
-        width: min(1160px, calc(100vw - 32px));
-        margin: 0 auto;
-        padding: 24px 0 48px;
-      }
-
-      .topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 32px;
-        padding: 16px 20px;
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        box-shadow: var(--shadow);
-        backdrop-filter: blur(18px);
-      }
-
-      .brand {
-        display: grid;
-        gap: 4px;
-      }
-
-      .brand strong {
-        font-size: 1rem;
-      }
-
-      .brand span {
-        font-size: 0.9rem;
-        color: var(--muted);
-      }
-
-      nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-
-      nav a {
-        padding: 8px 12px;
-        border-radius: 999px;
-        color: var(--muted);
-      }
-
-      nav a:hover {
-        background: var(--accent-soft);
-        color: var(--accent);
-      }
-
-      .page {
-        display: grid;
-        gap: 24px;
-      }
-
-      .panel {
-        background: var(--panel-strong);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        box-shadow: var(--shadow);
-      }
-
-      .section {
-        padding: 24px;
-      }
-
-      .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: var(--accent-soft);
-        color: var(--accent);
-        font-size: 0.84rem;
-      }
-
-      .hero-title {
-        margin: 16px 0 10px;
-        font-size: clamp(2rem, 5vw, 3.8rem);
-        line-height: 1.02;
-      }
-
-      .hero-copy {
-        margin: 0;
-        max-width: 720px;
-        color: var(--muted);
-        font-size: 1rem;
-        line-height: 1.7;
-      }
-
-      .footer {
-        margin-top: 32px;
-        color: var(--muted);
-        font-size: 0.92rem;
-        text-align: center;
-      }
-
-      @media (max-width: 720px) {
-        .shell {
-          width: min(100vw - 20px, 1160px);
-          padding-top: 16px;
-        }
-
-        .topbar {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .section {
-          padding: 18px;
-        }
-      }
-    </style>
+    <link rel="icon" type="image/svg+xml" href={sitePath("favicon.svg")} />
   </head>
   <body>
-    <div class="shell">
-      <header class="topbar">
-        <a class="brand" href={SITE_BASE}>
+    <div class={isReadingLayout ? "shell shell-reading" : "shell"}>
+      <header class="site-topbar">
+        <a class="site-brand" href={SITE_BASE}>
           <strong>Knowledge Notes</strong>
-          <span>从 Obsidian 整理出来的公开学习笔记</span>
+          <span>公开整理的研究笔记、方法笔记与编程笔记</span>
         </a>
-        <nav aria-label="Site">
-          <a href={SITE_BASE}>首页</a>
-          <a href={sitePath("notes/")}>全部笔记</a>
-          <a href={sitePath("categories/")}>分类</a>
-          <a href={sitePath("tags/")}>标签</a>
+        <nav class="site-nav" aria-label="Site">
+          <a href={SITE_BASE} aria-current={isCurrent(SITE_BASE) ? "page" : undefined}>首页</a>
+          <a href={sitePath("notes/")} aria-current={isCurrent(sitePath("notes/")) ? "page" : undefined}>
+            笔记
+          </a>
+          <a
+            href={sitePath("categories/")}
+            aria-current={isCurrent(sitePath("categories/")) ? "page" : undefined}
+          >
+            分类
+          </a>
+          <a href={sitePath("tags/")} aria-current={isCurrent(sitePath("tags/")) ? "page" : undefined}>
+            标签
+          </a>
         </nav>
       </header>
-      <main class="page">
-        <slot />
-      </main>
-      <footer class="footer">
-        Built from a private notes vault with a publish layer and Astro.
-      </footer>
+
+      <div class={isReadingLayout ? "page-grid page-grid-reading" : "page-grid"}>
+        {!isReadingLayout && <SidebarNav currentPath={currentPath} categories={categories} recentNotes={recentNotes} />}
+        <main class={isReadingLayout ? "page-main page-main-reading" : "page-main"}>
+          <slot />
+        </main>
+      </div>
+
+      <footer class="site-footer">内容来自私有 Obsidian 知识库，经筛选后通过 Astro 生成并部署为公开静态站点。</footer>
     </div>
   </body>
 </html>

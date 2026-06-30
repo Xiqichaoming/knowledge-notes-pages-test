@@ -1,7 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import NoteCard from "../../components/NoteCard.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import NoteListItem from "../../components/NoteListItem.astro";
+import { groupNotesByCategory, sortNotes } from "../../lib/notes";
 import { sitePath } from "../../lib/site-paths";
 
 export async function getStaticPaths() {
@@ -10,43 +12,199 @@ export async function getStaticPaths() {
   return tags.map((tag) => ({ params: { tag } }));
 }
 
-const { tag } = Astro.params;
-const notes = (await getCollection("notes"))
-  .filter((entry) => !entry.data.draft && entry.data.tags.includes(tag))
-  .sort((a, b) => b.data.updated.localeCompare(a.data.updated));
+const { tag = "" } = Astro.params;
+const notes = sortNotes(
+  (await getCollection("notes")).filter((entry) => !entry.data.draft && entry.data.tags.includes(tag))
+);
+const categories = groupNotesByCategory(notes);
+const latestUpdated = notes[0]?.data.updated ?? "暂无";
 ---
 
 <BaseLayout title={`#${tag}`}>
-  <section class="panel section">
-    <span class="eyebrow">Tag</span>
-    <h1 class="hero-title">#{tag}</h1>
-    <p class="hero-copy">当前标签下共 {notes.length} 篇公开笔记。</p>
+  <section class="surface section">
+    <Breadcrumbs items={[{ href: sitePath("tags/"), label: "标签" }, { label: `#${tag}` }]} />
+
+    <header class="page-head">
+      <span class="eyebrow">标签</span>
+      <h1>#{tag}</h1>
+      <p>当前标签下共 {notes.length} 篇公开笔记，分布在 {categories.length} 个分类中，最近一次整理时间为 {latestUpdated}。</p>
+    </header>
   </section>
 
-  <section class="grid">
-    {notes.map((note) => (
-      <NoteCard
-        href={sitePath(`notes/${note.slug}/`)}
-        title={note.data.title}
-        summary={note.data.summary}
-        categoryLabel={note.data.categoryLabel}
-        updated={note.data.updated}
-        tags={note.data.tags}
-      />
-    ))}
-  </section>
+  <div class="detail-grid">
+    <section class="surface section">
+      <div class="section-head">
+        <h2>标签下的笔记</h2>
+        <span class="section-summary">{notes.length} 篇</span>
+      </div>
+      <div class="note-stack">
+        {notes.map((note) => (
+          <NoteListItem
+            slug={note.slug}
+            title={note.data.title}
+            summary={note.data.summary}
+            categoryLabel={note.data.categoryLabel}
+            updated={note.data.updated}
+            tags={note.data.tags}
+          />
+        ))}
+      </div>
+    </section>
+
+    <aside class="detail-side">
+      <section class="surface-muted section-tight info-card">
+        <span class="info-label">概览</span>
+        <div class="info-metrics">
+          <div>
+            <strong>{notes.length}</strong>
+            <span>公开笔记</span>
+          </div>
+          <div>
+            <strong>{categories.length}</strong>
+            <span>关联分类</span>
+          </div>
+          <div>
+            <strong>{latestUpdated}</strong>
+            <span>最近更新</span>
+          </div>
+        </div>
+      </section>
+
+      {categories.length > 0 && (
+        <section class="surface-muted section-tight info-card">
+          <div class="info-head">
+            <span class="info-label">相关分类</span>
+            <a href={sitePath("categories/")}>全部分类</a>
+          </div>
+          <div class="directory-list">
+            {categories.map((category) => (
+              <a class="directory-item" href={sitePath(`categories/${category.slug}/`)}>
+                <strong>{category.label}</strong>
+                <span>{category.count}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </aside>
+  </div>
 </BaseLayout>
 
 <style>
-  .grid {
+  .page-head {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .page-head h1 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 2.7rem;
+    font-weight: 600;
+    line-height: 1.05;
+  }
+
+  .page-head p {
+    margin: 0;
+    max-width: 720px;
+    color: var(--text-soft);
+    line-height: 1.75;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .note-stack {
+    display: grid;
+    margin-top: 18px;
+  }
+
+  .detail-side {
+    display: grid;
     gap: 18px;
   }
 
-  @media (max-width: 860px) {
-    .grid {
+  .info-card {
+    display: grid;
+    gap: 16px;
+  }
+
+  .info-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .info-head a {
+    color: var(--accent);
+    font-size: 0.86rem;
+  }
+
+  .info-label,
+  .section-summary {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    letter-spacing: 0.04em;
+  }
+
+  .info-metrics,
+  .directory-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .info-metrics div {
+    display: grid;
+    gap: 4px;
+  }
+
+  .info-metrics strong {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .info-metrics span,
+  .directory-item span {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+  }
+
+  .directory-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--text-soft);
+  }
+
+  .directory-item:hover {
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--accent);
+  }
+
+  .directory-item strong {
+    font-size: 0.94rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 1080px) {
+    .detail-grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .page-head h1 {
+      font-size: 2.2rem;
     }
   }
 </style>

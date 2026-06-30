@@ -1,14 +1,138 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import SectionIntro from "../components/SectionIntro.astro";
+import { sitePath } from "../lib/site-paths";
 ---
 
-<BaseLayout title="About">
-  <section class="panel section">
-    <span class="eyebrow">About</span>
-    <h1 class="hero-title">这个站点怎么来的</h1>
-    <p class="hero-copy">
-      笔记原本写在私有 Obsidian 知识库中。发布时，脚本会抽取允许公开的笔记，
-      处理内部链接和附件，再把结果送进 Astro 站点构建成静态网页。
-    </p>
+<BaseLayout title="关于这个站点">
+  <SectionIntro
+    eyebrow="说明"
+    title="公开站是私有知识库的发布层，而不是写作现场。"
+    copy="日常写作仍在本地 Obsidian 知识库中完成。这里发布的内容，是经过筛选、清洗和结构化后，适合长期保留与外部分享的部分。"
+  />
+
+  <div class="about-grid">
+    <section class="surface section">
+      <div class="section-head">
+        <h2>发布流程</h2>
+      </div>
+      <ol class="workflow-list">
+        <li>
+          <strong>私有写作</strong>
+          <p>原始笔记先在本地知识库中持续迭代，允许保留草稿、碎片和未整理内容。</p>
+        </li>
+        <li>
+          <strong>筛选与清洗</strong>
+          <p>发布脚本只抽取允许公开的笔记，并处理内部链接、附件路径、元数据和公式渲染。</p>
+        </li>
+        <li>
+          <strong>静态构建与部署</strong>
+          <p>整理后的内容进入 Astro 站点，最终部署到 GitHub Pages，形成可长期访问的静态网页。</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="surface section">
+      <div class="section-head">
+        <h2>当前原则</h2>
+      </div>
+      <ul class="principle-list">
+        <li>公开站优先保证可读性、稳定链接和长期可维护性。</li>
+        <li>分类负责主结构，标签负责横向串联，不混用两套体系。</li>
+        <li>公开内容保持克制，只发布值得长期保留的部分。</li>
+        <li>写作端和展示端分离，后续自动化只围绕发布链路增强。</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="surface section">
+    <div class="section-head">
+      <h2>可浏览入口</h2>
+    </div>
+    <div class="entry-grid">
+      <a class="entry-card" href={sitePath("notes/")}>
+        <strong>全部笔记</strong>
+        <p>按更新时间浏览已经公开的内容。</p>
+      </a>
+      <a class="entry-card" href={sitePath("categories/")}>
+        <strong>分类目录</strong>
+        <p>按专题进入相对稳定的知识域。</p>
+      </a>
+      <a class="entry-card" href={sitePath("tags/")}>
+        <strong>标签目录</strong>
+        <p>跨专题检索相关主题和关键词。</p>
+      </a>
+    </div>
   </section>
 </BaseLayout>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 24px;
+  }
+
+  .workflow-list,
+  .principle-list {
+    display: grid;
+    gap: 16px;
+    margin: 18px 0 0;
+    padding-left: 1.2rem;
+  }
+
+  .workflow-list li,
+  .principle-list li {
+    color: var(--text-soft);
+    line-height: 1.75;
+    text-wrap: pretty;
+  }
+
+  .workflow-list strong,
+  .entry-card strong {
+    display: block;
+    margin-bottom: 6px;
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .workflow-list p,
+  .entry-card p {
+    margin: 0;
+  }
+
+  .entry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  .entry-card {
+    display: grid;
+    gap: 8px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255, 249, 242, 0.78);
+  }
+
+  .entry-card:hover {
+    border-color: var(--accent-line);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .entry-card p {
+    color: var(--text-soft);
+    line-height: 1.7;
+    text-wrap: pretty;
+  }
+
+  @media (max-width: 960px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

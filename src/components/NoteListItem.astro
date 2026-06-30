@@ -1,0 +1,77 @@
+---
+import { sitePath } from "../lib/site-paths";
+
+interface Props {
+  slug: string;
+  title: string;
+  summary: string;
+  categoryLabel: string;
+  updated: string;
+  tags: string[];
+}
+
+const { slug, title, summary, categoryLabel, updated, tags } = Astro.props;
+---
+
+<article class="list-item">
+  <div class="list-meta">
+    <span>{categoryLabel}</span>
+    <time datetime={updated}>{updated}</time>
+  </div>
+  <h2>
+    <a href={sitePath(`notes/${slug}/`)}>{title}</a>
+  </h2>
+  <p>{summary}</p>
+  <div class="chip-row">
+    {tags.slice(0, 3).map((tag) => (
+      <a class="chip" href={sitePath(`tags/${tag}/`)}>
+        #{tag}
+      </a>
+    ))}
+  </div>
+</article>
+
+<style>
+  .list-item {
+    display: grid;
+    gap: 12px;
+    padding: 18px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .list-item:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .list-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px 16px;
+    color: var(--text-muted);
+    font-size: 0.86rem;
+  }
+
+  .list-meta time {
+    white-space: nowrap;
+  }
+
+  .list-item h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .list-item h2 a:hover {
+    color: var(--accent);
+  }
+
+  .list-item p {
+    margin: 0;
+    color: var(--text-soft);
+    line-height: 1.7;
+  }
+</style>

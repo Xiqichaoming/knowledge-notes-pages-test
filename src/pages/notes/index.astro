@@ -1,46 +1,190 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import NoteCard from "../../components/NoteCard.astro";
+import NoteListItem from "../../components/NoteListItem.astro";
+import SectionIntro from "../../components/SectionIntro.astro";
+import { groupNotesByCategory, groupNotesByTag, sortNotes } from "../../lib/notes";
 import { sitePath } from "../../lib/site-paths";
 
-const notes = (await getCollection("notes"))
-  .filter((entry) => !entry.data.draft)
-  .sort((a, b) => b.data.updated.localeCompare(a.data.updated));
+const notes = sortNotes((await getCollection("notes")).filter((entry) => !entry.data.draft));
+const categories = groupNotesByCategory(notes);
+const tags = groupNotesByTag(notes);
+const latestUpdated = notes[0]?.data.updated ?? "暂无";
+const topTags = [...tags]
+  .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label))
+  .slice(0, 12);
 ---
 
 <BaseLayout title="全部笔记">
-  <section class="panel section">
-    <span class="eyebrow">Archive</span>
-    <h1 class="hero-title">全部公开笔记</h1>
-    <p class="hero-copy">
-      这里收录已经从私有知识库筛选并清洗过的内容。原始写作仍然发生在本地 Obsidian 库中。
-    </p>
+  <SectionIntro
+    eyebrow="归档"
+    title="全部公开笔记"
+    copy="这里收录已经从私有知识库筛选并清洗过的内容。日常写作仍然发生在本地 Obsidian 知识库中，公开站只承接可长期保留与可稳定分享的部分。"
+  />
+
+  <section class="overview-grid">
+    <article class="surface-muted section-tight stat-card">
+      <span class="stat-label">公开笔记</span>
+      <strong class="stat-value">{notes.length}</strong>
+    </article>
+    <article class="surface-muted section-tight stat-card">
+      <span class="stat-label">专题分类</span>
+      <strong class="stat-value">{categories.length}</strong>
+    </article>
+    <article class="surface-muted section-tight stat-card">
+      <span class="stat-label">标签</span>
+      <strong class="stat-value">{tags.length}</strong>
+    </article>
+    <article class="surface-muted section-tight stat-card">
+      <span class="stat-label">最近更新</span>
+      <strong class="stat-value stat-value-date">{latestUpdated}</strong>
+    </article>
   </section>
 
-  <section class="grid">
-    {notes.map((note) => (
-      <NoteCard
-        href={sitePath(`notes/${note.slug}/`)}
-        title={note.data.title}
-        summary={note.data.summary}
-        categoryLabel={note.data.categoryLabel}
-        updated={note.data.updated}
-        tags={note.data.tags}
-      />
-    ))}
+  <section class="archive-layout">
+    <section class="surface section">
+      <div class="section-head">
+        <h2>按更新时间浏览</h2>
+        <span class="section-summary">{notes.length} 篇</span>
+      </div>
+      <div class="note-stack">
+        {notes.map((note) => (
+          <NoteListItem
+            slug={note.slug}
+            title={note.data.title}
+            summary={note.data.summary}
+            categoryLabel={note.data.categoryLabel}
+            updated={note.data.updated}
+            tags={note.data.tags}
+          />
+        ))}
+      </div>
+    </section>
+
+    <aside class="archive-side">
+      <section class="surface section-tight">
+        <div class="section-head">
+          <h2>专题分布</h2>
+          <a href={sitePath("categories/")}>全部分类</a>
+        </div>
+        <div class="directory-list">
+          {categories.map((category) => (
+            <a class="directory-item" href={sitePath(`categories/${category.slug}/`)}>
+              <strong>{category.label}</strong>
+              <span>{category.count}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section class="surface section-tight">
+        <div class="section-head">
+          <h2>常用标签</h2>
+          <a href={sitePath("tags/")}>全部标签</a>
+        </div>
+        <div class="chip-row">
+          {topTags.map((tag) => (
+            <a class="chip" href={sitePath(`tags/${tag.slug}/`)}>
+              #{tag.label}
+            </a>
+          ))}
+        </div>
+      </section>
+    </aside>
   </section>
 </BaseLayout>
 
 <style>
-  .grid {
+  .overview-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
   }
 
-  @media (max-width: 860px) {
-    .grid {
+  .stat-card {
+    display: grid;
+    gap: 10px;
+    min-height: 112px;
+    align-content: space-between;
+  }
+
+  .stat-label {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    letter-spacing: 0.04em;
+  }
+
+  .stat-value {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+
+  .stat-value-date {
+    font-size: 1.1rem;
+  }
+
+  .archive-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .note-stack {
+    display: grid;
+    margin-top: 18px;
+  }
+
+  .archive-side {
+    display: grid;
+    gap: 18px;
+  }
+
+  .directory-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .directory-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: var(--text-soft);
+  }
+
+  .directory-item:hover {
+    background: var(--surface-muted);
+    color: var(--accent);
+  }
+
+  .directory-item strong {
+    font-size: 0.94rem;
+    font-weight: 600;
+  }
+
+  .directory-item span,
+  .section-summary {
+    color: var(--text-muted);
+    font-size: 0.86rem;
+  }
+
+  @media (max-width: 1080px) {
+    .overview-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .archive-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .overview-grid {
       grid-template-columns: 1fr;
     }
   }

@@ -1,66 +1,94 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import SectionIntro from "../../components/SectionIntro.astro";
+import { groupNotesByCategory, sortNotes } from "../../lib/notes";
 import { sitePath } from "../../lib/site-paths";
 
-const notes = (await getCollection("notes")).filter((entry) => !entry.data.draft);
-const groups = Object.values(
-  notes.reduce((acc, entry) => {
-    const key = entry.data.category;
-    if (!acc[key]) {
-      acc[key] = {
-        slug: key,
-        label: entry.data.categoryLabel,
-        count: 0
-      };
-    }
-    acc[key].count += 1;
-    return acc;
-  }, {})
-);
+const notes = sortNotes((await getCollection("notes")).filter((entry) => !entry.data.draft));
+const groups = groupNotesByCategory(notes);
 ---
 
 <BaseLayout title="分类">
-  <section class="panel section">
-    <span class="eyebrow">Categories</span>
-    <h1 class="hero-title">按分类浏览</h1>
-    <p class="hero-copy">先把主要内容按主题收住，后续再扩展到更多方向。</p>
-  </section>
+  <SectionIntro
+    eyebrow="分类"
+    title="按专题浏览"
+    copy="这里先按较稳定的主题结构组织公开内容。每个分类都对应一个持续扩展的知识域，而不是一次性的文章集合。"
+  />
 
-  <section class="cards">
-    {groups.map((group) => (
-      <a class="panel card" href={sitePath(`categories/${group.slug}/`)}>
-        <strong>{group.label}</strong>
-        <span>{group.count} 篇笔记</span>
-      </a>
-    ))}
+  <section class="surface section">
+    <div class="section-head">
+      <h2>专题目录</h2>
+      <span class="section-summary">{groups.length} 个分类</span>
+    </div>
+
+    <div class="cards">
+      {groups.map((group) => (
+        <a class="card" href={sitePath(`categories/${group.slug}/`)}>
+          <div class="card-meta">
+            <span>{group.count} 篇笔记</span>
+            {group.notes[0] && <time datetime={group.notes[0].data.updated}>{group.notes[0].data.updated}</time>}
+          </div>
+          <strong>{group.label}</strong>
+          <p>{group.notes[0]?.data.summary ?? "这个专题会继续扩展。"} </p>
+          {group.notes[0] && <span class="card-latest">最近更新：{group.notes[0].data.title}</span>}
+        </a>
+      ))}
+    </div>
   </section>
 </BaseLayout>
 
 <style>
   .cards {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
     gap: 18px;
+    margin-top: 18px;
   }
 
   .card {
-    padding: 22px;
     display: grid;
-    gap: 8px;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255, 249, 242, 0.78);
+  }
+
+  .card:hover {
+    border-color: var(--accent-line);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .card-meta time {
+    white-space: nowrap;
   }
 
   .card strong {
-    font-size: 1.1rem;
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    font-weight: 600;
   }
 
-  .card span {
-    color: #72655b;
+  .card p {
+    margin: 0;
+    color: var(--text-soft);
+    line-height: 1.7;
+    text-wrap: pretty;
   }
 
-  @media (max-width: 860px) {
-    .cards {
-      grid-template-columns: 1fr;
-    }
+  .card-latest,
+  .section-summary {
+    color: var(--text-muted);
+    font-size: 0.86rem;
   }
+
 </style>

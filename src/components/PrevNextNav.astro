@@ -1,0 +1,83 @@
+---
+import type { NoteEntry } from "../lib/notes";
+import { sitePath } from "../lib/site-paths";
+
+interface Props {
+  previous?: NoteEntry | null;
+  next?: NoteEntry | null;
+}
+
+const { previous = null, next = null } = Astro.props;
+---
+
+<section class="surface section-tight nav-grid">
+  <div class="nav-cell">
+    {previous ? (
+      <>
+        <span>上一篇</span>
+        <a href={sitePath(`notes/${previous.slug}/`)}>
+          <strong>{previous.data.title}</strong>
+        </a>
+      </>
+    ) : (
+      <>
+        <span>上一篇</span>
+        <strong class="nav-empty">暂无</strong>
+      </>
+    )}
+  </div>
+  <div class="nav-cell">
+    {next ? (
+      <>
+        <span>下一篇</span>
+        <a href={sitePath(`notes/${next.slug}/`)}>
+          <strong>{next.data.title}</strong>
+        </a>
+      </>
+    ) : (
+      <>
+        <span>下一篇</span>
+        <strong class="nav-empty">暂无</strong>
+      </>
+    )}
+  </div>
+</section>
+
+<style>
+  .nav-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .nav-cell {
+    display: grid;
+    gap: 8px;
+  }
+
+  .nav-cell span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .nav-cell strong {
+    font-family: var(--font-serif);
+    font-size: 1.06rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .nav-cell a:hover {
+    color: var(--accent);
+  }
+
+  .nav-empty {
+    color: var(--text-soft);
+  }
+
+  @media (max-width: 720px) {
+    .nav-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
