@@ -5,7 +5,7 @@ summary: "Batch Normalization 的背景、设计目标和训练意义笔记。"
 category: "ai"
 categoryLabel: "AI Notes"
 tags: ["deep-learning", "normalization", "training"]
-updated: "2026-07-01"
+updated: "2026-06-11"
 source: "AI知识库/神经网络Tricks/批归一化.md"
 draft: false
 ---

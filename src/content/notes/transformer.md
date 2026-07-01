@@ -5,7 +5,7 @@ summary: "Transformer 论文的背景、结构与关键机制笔记。"
 category: "ai"
 categoryLabel: "AI Notes"
 tags: ["deep-learning", "transformer", "attention"]
-updated: "2026-07-01"
+updated: "2026-05-25"
 source: "AI知识库/Transformer.md"
 draft: false
 ---

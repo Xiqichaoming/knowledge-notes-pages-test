@@ -5,7 +5,7 @@ summary: "Python 基础语法、注释、变量、分支与循环结构笔记。
 category: "python"
 categoryLabel: "Python Notes"
 tags: ["python", "syntax", "basics"]
-updated: "2026-07-01"
+updated: "2026-02-03"
 source: "Python/Python的基础语法.md"
 draft: false
 ---

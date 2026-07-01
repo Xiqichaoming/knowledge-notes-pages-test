@@ -17,7 +17,19 @@ export interface TagGroup {
 }
 
 export const sortNotes = (notes: NoteEntry[]) =>
-  [...notes].sort((left, right) => right.data.updated.localeCompare(left.data.updated));
+  [...notes].sort((left, right) => {
+    const byUpdated = right.data.updated.localeCompare(left.data.updated);
+    if (byUpdated !== 0) {
+      return byUpdated;
+    }
+
+    const byTitle = left.data.title.localeCompare(right.data.title, "zh-CN");
+    if (byTitle !== 0) {
+      return byTitle;
+    }
+
+    return left.slug.localeCompare(right.slug);
+  });
 
 export const groupNotesByCategory = (notes: NoteEntry[]): CategoryGroup[] => {
   const groups = new Map<string, CategoryGroup>();
@@ -96,7 +108,12 @@ export const buildRelated = (notes: NoteEntry[], current: NoteEntry, count = 3) 
       if (right.score !== left.score) {
         return right.score - left.score;
       }
-      return right.note.data.updated.localeCompare(left.note.data.updated);
+      const byUpdated = right.note.data.updated.localeCompare(left.note.data.updated);
+      if (byUpdated !== 0) {
+        return byUpdated;
+      }
+
+      return left.note.data.title.localeCompare(right.note.data.title, "zh-CN");
     });
 
   return scored.slice(0, count).map((item) => item.note);

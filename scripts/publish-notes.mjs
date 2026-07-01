@@ -104,6 +104,42 @@ const normalizeDisplayMathLines = (value) => {
     .join("\n");
 };
 
+const toDateString = (value) => {
+  if (!value) return null;
+
+  if (value instanceof Date && !Number.isNaN(value.valueOf())) {
+    return value.toISOString().slice(0, 10);
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      return trimmed;
+    }
+
+    const parsed = new Date(trimmed);
+    if (!Number.isNaN(parsed.valueOf())) {
+      return parsed.toISOString().slice(0, 10);
+    }
+  }
+
+  return null;
+};
+
+const getUpdatedDate = async (sourcePath, parsed) => {
+  const frontmatterUpdated = toDateString(parsed.data.updated);
+  if (frontmatterUpdated) {
+    return frontmatterUpdated;
+  }
+
+  try {
+    const stats = await fs.stat(sourcePath);
+    return stats.mtime.toISOString().slice(0, 10);
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+};
+
 const normalizeBody = async (body, noteDir, linkLookup, missingRefs) => {
   let output = body;
 
@@ -142,14 +178,14 @@ const normalizeBody = async (body, noteDir, linkLookup, missingRefs) => {
   return output;
 };
 
-const frontmatterFor = (note) => ({
+const frontmatterFor = (note, updated) => ({
   title: note.title,
   slug: note.slug,
   summary: note.summary,
   category: note.category,
   categoryLabel: categoryLabelMap[note.category] ?? note.category,
   tags: note.tags,
-  updated: new Date().toISOString().slice(0, 10),
+  updated,
   source: note.source,
   draft: false
 });
@@ -181,6 +217,7 @@ const main = async () => {
     const sourcePath = path.join(sourceRoot, note.source);
     const raw = await fs.readFile(sourcePath, "utf8");
     const parsed = matter(raw);
+    const updated = await getUpdatedDate(sourcePath, parsed);
     const missingRefs = [];
     const normalizedBody = await normalizeBody(
       parsed.content,
@@ -188,7 +225,7 @@ const main = async () => {
       linkLookup,
       missingRefs
     );
-    const output = `${toFrontmatterString(frontmatterFor(note))}${normalizedBody.trim()}\n`;
+    const output = `${toFrontmatterString(frontmatterFor(note, updated))}${normalizedBody.trim()}\n`;
     const publishPath = path.join(publishNotesDir, `${note.slug}.md`);
     const sitePath = path.join(siteNotesDir, `${note.slug}.md`);
 
@@ -199,6 +236,7 @@ const main = async () => {
       slug: note.slug,
       title: note.title,
       source: note.source,
+      updated,
       missingRefs
     });
   }
