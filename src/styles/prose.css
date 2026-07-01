@@ -48,11 +48,14 @@
 
 .prose img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: min(100%, 860px);
+  max-height: min(72vh, 720px);
   height: auto;
-  margin: 1.45rem 0;
+  margin: 1.55rem auto;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
+  object-fit: contain;
   box-shadow: var(--shadow-soft);
 }
 
@@ -103,11 +106,36 @@
 }
 
 .prose .katex-display {
+  display: block;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.65rem 0;
+  margin: 1.35rem auto;
+  padding: 0.9rem 0.5rem;
+  text-align: center;
 }
 
 .prose .katex {
   font-size: 1.05em;
+}
+
+.prose .katex-display > .katex {
+  display: inline-block;
+  font-size: 1.22em;
+  line-height: 1.35;
+  text-align: initial;
+}
+
+@media (max-width: 720px) {
+  .prose img {
+    max-height: 68vh;
+  }
+
+  .prose .katex-display {
+    margin: 1.15rem calc(-1 * min(10px, 2vw));
+    padding: 0.75rem min(10px, 2vw);
+  }
+
+  .prose .katex-display > .katex {
+    font-size: 1.14em;
+  }
 }
