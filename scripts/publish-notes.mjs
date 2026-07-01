@@ -82,8 +82,32 @@ const buildLookup = (selectedNotes) => {
   return map;
 };
 
+const normalizeDisplayMathLines = (value) => {
+  let inCodeFence = false;
+  return value
+    .split(/\r?\n/)
+    .map((line) => {
+      if (line.trimStart().startsWith("```")) {
+        inCodeFence = !inCodeFence;
+        return line;
+      }
+      if (inCodeFence) return line;
+
+      const match = line.match(/^([ \t]*)\$\$([^\n\r]+?)\$\$[ \t]*$/);
+      if (!match) return line;
+
+      const [, indent, formula] = match;
+      const trimmedFormula = formula.trim();
+      if (!trimmedFormula) return line;
+      return `${indent}$$\n${indent}${trimmedFormula}\n${indent}$$`;
+    })
+    .join("\n");
+};
+
 const normalizeBody = async (body, noteDir, linkLookup, missingRefs) => {
   let output = body;
+
+  output = normalizeDisplayMathLines(output);
 
   const imageMatches = [...body.matchAll(imagePattern)];
   for (const match of imageMatches) {

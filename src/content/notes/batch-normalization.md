@@ -41,17 +41,25 @@ draft: false
 对于一个 mini-batch $\mathcal{B} = \{x_1, x_2, ..., x_m\}$，在某一层上执行以下四步：
 
 1. **计算 mini-batch 的均值**  
-   $$\mu_\mathcal{B} = \frac{1}{m} \sum_{i=1}^m x_i$$
+   $$
+   \mu_\mathcal{B} = \frac{1}{m} \sum_{i=1}^m x_i
+   $$
 
 2. **计算 mini-batch 的方差**  
-   $$\sigma_\mathcal{B}^2 = \frac{1}{m} \sum_{i=1}^m (x_i - \mu_\mathcal{B})^2$$
+   $$
+   \sigma_\mathcal{B}^2 = \frac{1}{m} \sum_{i=1}^m (x_i - \mu_\mathcal{B})^2
+   $$
 
 3. **标准化**  
-   $$\hat{x}_i = \frac{x_i - \mu_\mathcal{B}}{\sqrt{\sigma_\mathcal{B}^2 + \epsilon}}$$  
+   $$
+   \hat{x}_i = \frac{x_i - \mu_\mathcal{B}}{\sqrt{\sigma_\mathcal{B}^2 + \epsilon}}
+   $$
    （$\epsilon$ 是防止除零的小常数，一般取 $10^{-5}$）
 
 4. **缩放与平移**  
-   $$y_i = \gamma \hat{x}_i + \beta$$  
+   $$
+   y_i = \gamma \hat{x}_i + \beta
+   $$
    - $\gamma$ 初始化为 1，$\beta$ 初始化为 0
    - 这两个参数是反向传播学习的
 
@@ -64,15 +72,21 @@ draft: false
 ### 训练阶段
 - 每个 mini-batch 进来，**就用这个 batch 自己的统计量**（$\mu_\mathcal{B}$ 和 $\sigma_\mathcal{B}^2$）做标准化。
 - 同时，**维护一组全局的滑动平均统计量**，为推理做准备：
-  $$\mu_{\text{running}} \leftarrow \text{momentum} \cdot \mu_{\text{running}} + (1 - \text{momentum}) \cdot \mu_\mathcal{B}$$
-  $$\sigma_{\text{running}}^2 \leftarrow \text{momentum} \cdot \sigma_{\text{running}}^2 + (1 - \text{momentum}) \cdot \sigma_\mathcal{B}^2$$
+  $$
+  \mu_{\text{running}} \leftarrow \text{momentum} \cdot \mu_{\text{running}} + (1 - \text{momentum}) \cdot \mu_\mathcal{B}
+  $$
+  $$
+  \sigma_{\text{running}}^2 \leftarrow \text{momentum} \cdot \sigma_{\text{running}}^2 + (1 - \text{momentum}) \cdot \sigma_\mathcal{B}^2
+  $$
   - PyTorch 中 `momentum` 默认 0.1，表示新 batch 统计量的权重是 0.1。
 
 ### 推理阶段
 - 不再有 batch，直接用训练时存下来的全局统计量 $\mu_{\text{running}}$ 和 $\sigma_{\text{running}}^2$。
 - $\gamma$ 和 $\beta$ 固定不变。
 - 此时 BN 的运算本质上就是一个**线性变换**：
-  $$y = \gamma \cdot \frac{x - \mu_{\text{running}}}{\sqrt{\sigma_{\text{running}}^2 + \epsilon}} + \beta$$
+  $$
+  y = \gamma \cdot \frac{x - \mu_{\text{running}}}{\sqrt{\sigma_{\text{running}}^2 + \epsilon}} + \beta
+  $$
 - 正因为是线性变换，部署时可以将 BN **融合到前一层的卷积或全连接层**，把乘法和加法直接合并到卷积核和 bias 中，实现零额外开销推理。
 
 ---

@@ -135,11 +135,30 @@ const displaySummary = cleanDisplayText(entry.data.summary);
     display: grid;
     align-content: start;
     gap: 18px;
-  }
-
-  .side-panel {
     position: sticky;
     top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding-right: 2px;
+    scrollbar-gutter: stable;
+  }
+
+  .article-side::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .article-side::-webkit-scrollbar-track {
+    background: rgba(31, 26, 23, 0.05);
+    border-radius: 999px;
+  }
+
+  .article-side::-webkit-scrollbar-thumb {
+    background: rgba(15, 118, 110, 0.22);
+    border-radius: 999px;
+  }
+
+  .article-side::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 118, 110, 0.34);
   }
 
   .toc-list {
@@ -169,8 +188,11 @@ const displaySummary = cleanDisplayText(entry.data.summary);
       grid-template-columns: 1fr;
     }
 
-    .side-panel {
+    .article-side {
       position: static;
+      max-height: none;
+      overflow: visible;
+      padding-right: 0;
     }
   }
 

@@ -125,6 +125,21 @@
   text-align: initial;
 }
 
+.prose p:has(> .katex:only-child) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 1.35rem auto;
+  padding: 0.9rem 0.5rem;
+  text-align: center;
+}
+
+.prose p:has(> .katex:only-child) > .katex {
+  display: inline-block;
+  font-size: 1.22em;
+  line-height: 1.35;
+  text-align: initial;
+}
+
 @media (max-width: 720px) {
   .prose img {
     max-height: 68vh;
@@ -135,7 +150,8 @@
     padding: 0.75rem min(10px, 2vw);
   }
 
-  .prose .katex-display > .katex {
+  .prose .katex-display > .katex,
+  .prose p:has(> .katex:only-child) > .katex {
     font-size: 1.14em;
   }
 }
