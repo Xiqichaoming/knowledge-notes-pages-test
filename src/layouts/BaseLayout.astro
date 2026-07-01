@@ -16,7 +16,7 @@ interface Props {
 
 const {
   title,
-  description = "个人学习笔记与整理记录",
+  description = "学习记录与笔记随想",
   layout = "default"
 } = Astro.props;
 const pageTitle = title === "Knowledge Notes" ? title : `${title} | Knowledge Notes`;
@@ -44,7 +44,7 @@ const isCurrent = (href: string) =>
       <header class="site-topbar">
         <a class="site-brand" href={SITE_BASE}>
           <strong>Knowledge Notes</strong>
-          <span>个人学习记录与公开笔记整理</span>
+          <span>学习记录与笔记随想</span>
         </a>
         <nav class="site-nav" aria-label="Site">
           <a href={SITE_BASE} aria-current={isCurrent(SITE_BASE) ? "page" : undefined}>首页</a>
@@ -70,7 +70,7 @@ const isCurrent = (href: string) =>
         </main>
       </div>
 
-      <footer class="site-footer">内容来自本地 Obsidian 知识库，经过筛选整理后发布为公开静态站点</footer>
+      <footer class="site-footer">Knowledge compiles into wisdom</footer>
     </div>
   </body>
 </html>
