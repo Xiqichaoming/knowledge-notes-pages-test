@@ -1,5 +1,6 @@
 ---
 import { sitePath } from "../lib/site-paths";
+import { cleanDisplayText } from "../lib/display-text";
 
 interface Props {
   slug: string;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const { slug, title, summary, categoryLabel, updated, tags } = Astro.props;
+const displaySummary = cleanDisplayText(summary);
 ---
 
 <article class="list-item">
@@ -21,7 +23,7 @@ const { slug, title, summary, categoryLabel, updated, tags } = Astro.props;
   <h2>
     <a href={sitePath(`notes/${slug}/`)}>{title}</a>
   </h2>
-  <p>{summary}</p>
+  <p>{displaySummary}</p>
   <div class="chip-row">
     {tags.slice(0, 3).map((tag) => (
       <a class="chip" href={sitePath(`tags/${tag}/`)}>

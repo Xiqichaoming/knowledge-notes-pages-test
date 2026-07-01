@@ -7,8 +7,8 @@ import { sitePath } from "../lib/site-paths";
 <BaseLayout title="关于这个站点">
   <SectionIntro
     eyebrow="说明"
-    title="公开站是私有知识库的发布层，而不是写作现场。"
-    copy="日常写作仍在本地 Obsidian 知识库中完成。这里发布的内容，是经过筛选、清洗和结构化后，适合长期保留与外部分享的部分。"
+    title="这是我的公开笔记整理层"
+    copy="日常写作仍在本地知识库中完成，这里只放适合长期保留和公开查看的整理版本"
   />
 
   <div class="about-grid">
@@ -19,15 +19,15 @@ import { sitePath } from "../lib/site-paths";
       <ol class="workflow-list">
         <li>
           <strong>私有写作</strong>
-          <p>原始笔记先在本地知识库中持续迭代，允许保留草稿、碎片和未整理内容。</p>
+          <p>原始笔记先在本地知识库中持续迭代，允许保留草稿、碎片和未整理内容</p>
         </li>
         <li>
           <strong>筛选与清洗</strong>
-          <p>发布脚本只抽取允许公开的笔记，并处理内部链接、附件路径、元数据和公式渲染。</p>
+          <p>发布脚本只抽取允许公开的笔记，并处理内部链接、附件路径、元数据和公式渲染</p>
         </li>
         <li>
           <strong>静态构建与部署</strong>
-          <p>整理后的内容进入 Astro 站点，最终部署到 GitHub Pages，形成可长期访问的静态网页。</p>
+          <p>整理后的内容进入 Astro 站点，最终部署到 GitHub Pages，形成可长期访问的静态网页</p>
         </li>
       </ol>
     </section>
@@ -37,10 +37,10 @@ import { sitePath } from "../lib/site-paths";
         <h2>当前原则</h2>
       </div>
       <ul class="principle-list">
-        <li>公开站优先保证可读性、稳定链接和长期可维护性。</li>
-        <li>分类负责主结构，标签负责横向串联，不混用两套体系。</li>
-        <li>公开内容保持克制，只发布值得长期保留的部分。</li>
-        <li>写作端和展示端分离，后续自动化只围绕发布链路增强。</li>
+        <li>公开站优先保证可读性、稳定链接和长期可维护性</li>
+        <li>分类负责主结构，标签负责横向串联，不混用两套体系</li>
+        <li>公开内容保持克制，只发布值得长期保留的部分</li>
+        <li>写作端和展示端分离，后续自动化只围绕发布链路增强</li>
       </ul>
     </section>
   </div>
@@ -52,15 +52,15 @@ import { sitePath } from "../lib/site-paths";
     <div class="entry-grid">
       <a class="entry-card" href={sitePath("notes/")}>
         <strong>全部笔记</strong>
-        <p>按更新时间浏览已经公开的内容。</p>
+        <p>按更新时间浏览已经公开的内容</p>
       </a>
       <a class="entry-card" href={sitePath("categories/")}>
         <strong>分类目录</strong>
-        <p>按专题进入相对稳定的知识域。</p>
+        <p>按专题进入相对稳定的知识域</p>
       </a>
       <a class="entry-card" href={sitePath("tags/")}>
         <strong>标签目录</strong>
-        <p>跨专题检索相关主题和关键词。</p>
+        <p>跨专题检索相关主题和关键词</p>
       </a>
     </div>
   </section>

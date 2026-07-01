@@ -4,6 +4,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import SectionIntro from "../../components/SectionIntro.astro";
 import { groupNotesByCategory, sortNotes } from "../../lib/notes";
 import { sitePath } from "../../lib/site-paths";
+import { cleanDisplayText } from "../../lib/display-text";
 
 const notes = sortNotes((await getCollection("notes")).filter((entry) => !entry.data.draft));
 const groups = groupNotesByCategory(notes);
@@ -13,7 +14,7 @@ const groups = groupNotesByCategory(notes);
   <SectionIntro
     eyebrow="分类"
     title="按专题浏览"
-    copy="这里先按较稳定的主题结构组织公开内容。每个分类都对应一个持续扩展的知识域，而不是一次性的文章集合。"
+    copy="分类用于收住相对稳定的学习主题，方便从一个方向持续追踪相关笔记"
   />
 
   <section class="surface section">
@@ -30,7 +31,7 @@ const groups = groupNotesByCategory(notes);
             {group.notes[0] && <time datetime={group.notes[0].data.updated}>{group.notes[0].data.updated}</time>}
           </div>
           <strong>{group.label}</strong>
-          <p>{group.notes[0]?.data.summary ?? "这个专题会继续扩展。"} </p>
+          <p>{cleanDisplayText(group.notes[0]?.data.summary ?? "这个专题会继续扩展")} </p>
           {group.notes[0] && <span class="card-latest">最近更新：{group.notes[0].data.title}</span>}
         </a>
       ))}

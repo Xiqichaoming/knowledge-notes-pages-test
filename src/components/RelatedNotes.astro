@@ -1,6 +1,7 @@
 ---
 import type { NoteEntry } from "../lib/notes";
 import { sitePath } from "../lib/site-paths";
+import { cleanDisplayText } from "../lib/display-text";
 
 interface Props {
   notes: NoteEntry[];
@@ -21,7 +22,7 @@ const { notes } = Astro.props;
           <a href={sitePath(`notes/${note.slug}/`)}>
             <strong>{note.data.title}</strong>
           </a>
-          <p>{note.data.summary}</p>
+          <p>{cleanDisplayText(note.data.summary)}</p>
         </article>
       ))}
     </div>

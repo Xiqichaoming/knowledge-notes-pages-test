@@ -6,50 +6,63 @@ import NoteListItem from "../components/NoteListItem.astro";
 import SectionIntro from "../components/SectionIntro.astro";
 import { groupNotesByCategory, sortNotes } from "../lib/notes";
 import { sitePath } from "../lib/site-paths";
+import { cleanDisplayText } from "../lib/display-text";
 
 const notes = sortNotes((await getCollection("notes")).filter((entry) => !entry.data.draft));
-const featured = notes[0];
-const recentNotes = notes.slice(1, 4);
+const featuredNotes = notes.slice(0, 2);
+const recentNotes = notes.slice(2, 5);
 const categories = groupNotesByCategory(notes);
 ---
 
-<BaseLayout title="Knowledge Notes" description="公开整理的学习笔记与研究笔记。">
+<BaseLayout title="Knowledge Notes" description="个人学习笔记与整理记录">
   <SectionIntro
     eyebrow="公开站"
-    title="研究笔记应该像一个可浏览的知识库，而不是散乱的文件夹。"
-    copy="这里发布的是从私有 Obsidian 知识库中筛选和整理出来的公开内容。每篇笔记都保留专题上下文，便于持续扩展和回看。"
+    title="把学习过程整理成可以回看的知识记录"
+    copy="这里放的是从本地知识库中筛选出的公开笔记，偏向学习记录、方法整理和阶段性复盘"
   />
 
-  <section class="hero-grid">
-    <article class="surface section feature-card">
-      <div class="section-head">
-        <h2>精选笔记</h2>
-        <a href={sitePath(`notes/${featured.slug}/`)}>阅读全文</a>
-      </div>
-      <span class="eyebrow">{featured.data.categoryLabel}</span>
-      <h3>
-        <a href={sitePath(`notes/${featured.slug}/`)}>{featured.data.title}</a>
-      </h3>
-      <p>{featured.data.summary}</p>
-      <div class="meta-line">
-        <span>{featured.data.updated}</span>
-        <span>{featured.data.tags.length} 个标签</span>
-      </div>
-      <div class="chip-row">
-        {featured.data.tags.map((tag) => (
-          <a class="chip" href={sitePath(`tags/${tag}/`)}>
-            #{tag}
-          </a>
-        ))}
-      </div>
-    </article>
+  <section class="surface section topic-section">
+    <div class="section-head">
+      <h2>专题入口</h2>
+      <a href={sitePath("categories/")}>完整分类</a>
+    </div>
+    <div class="topic-grid">
+      {categories.map((category) => (
+        <a class="topic-card" href={sitePath(`categories/${category.slug}/`)}>
+          <span>{category.label}</span>
+          <strong>{category.count} 篇笔记</strong>
+          <p>{cleanDisplayText(category.notes[0]?.data.summary ?? "")}</p>
+        </a>
+      ))}
+    </div>
+  </section>
 
+  <section class="feature-update-grid">
     <section class="surface section">
       <div class="section-head">
-        <h2>最近更新</h2>
+        <h2>精选笔记</h2>
         <a href={sitePath("notes/")}>查看全部</a>
       </div>
-      <div class="recent-stack">
+      <div class="featured-grid">
+        {featuredNotes.map((note) => (
+          <NoteCard
+            href={sitePath(`notes/${note.slug}/`)}
+            title={note.data.title}
+            summary={note.data.summary}
+            categoryLabel={note.data.categoryLabel}
+            updated={note.data.updated}
+            tags={note.data.tags}
+          />
+        ))}
+      </div>
+    </section>
+
+    <section class="surface section recent-panel">
+      <div class="section-head">
+        <h2>最近更新</h2>
+        <a href={sitePath("notes/")}>进入归档</a>
+      </div>
+      <div class="recent-scroll">
         {recentNotes.map((note) => (
           <NoteListItem
             slug={note.slug}
@@ -62,22 +75,6 @@ const categories = groupNotesByCategory(notes);
         ))}
       </div>
     </section>
-  </section>
-
-  <section class="surface section">
-    <div class="section-head">
-      <h2>专题入口</h2>
-      <a href={sitePath("categories/")}>完整分类</a>
-    </div>
-    <div class="topic-grid">
-      {categories.map((category) => (
-        <a class="topic-card" href={sitePath(`categories/${category.slug}/`)}>
-          <span>{category.label}</span>
-          <strong>{category.count} 篇笔记</strong>
-          <p>{category.notes[0]?.data.summary ?? ""}</p>
-        </a>
-      ))}
-    </div>
   </section>
 
   <section class="surface section">
@@ -101,39 +98,55 @@ const categories = groupNotesByCategory(notes);
 </BaseLayout>
 
 <style>
-  .hero-grid {
+  .feature-update-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     gap: 24px;
     align-items: start;
   }
 
-  .feature-card {
+  .section-head {
+    margin-bottom: 18px;
+  }
+
+  .featured-grid {
     display: grid;
-    justify-items: start;
-    gap: 16px;
-    align-content: start;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
   }
 
-  .feature-card h3 {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-size: 2rem;
-    font-weight: 600;
-    line-height: 1.08;
+  .recent-panel {
+    max-height: 380px;
+    overflow: hidden;
   }
 
-  .feature-card h3 a:hover {
-    color: var(--accent);
+  .recent-scroll {
+    display: grid;
+    max-height: 292px;
+    overflow-y: auto;
+    padding-right: 8px;
+    scrollbar-gutter: stable;
   }
 
-  .feature-card p {
-    margin: 0;
-    color: var(--text-soft);
-    line-height: 1.75;
+  .recent-scroll::-webkit-scrollbar {
+    width: 8px;
   }
 
-  .recent-stack {
+  .recent-scroll::-webkit-scrollbar-track {
+    background: rgba(31, 26, 23, 0.05);
+    border-radius: 999px;
+  }
+
+  .recent-scroll::-webkit-scrollbar-thumb {
+    background: rgba(15, 118, 110, 0.22);
+    border-radius: 999px;
+  }
+
+  .recent-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 118, 110, 0.34);
+  }
+
+  .topic-section {
     display: grid;
   }
 
@@ -181,7 +194,8 @@ const categories = groupNotesByCategory(notes);
   }
 
   @media (max-width: 1080px) {
-    .hero-grid,
+    .feature-update-grid,
+    .featured-grid,
     .topic-grid,
     .archive-grid {
       grid-template-columns: 1fr;

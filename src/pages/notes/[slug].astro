@@ -8,6 +8,7 @@ import PrevNextNav from "../../components/PrevNextNav.astro";
 import RelatedNotes from "../../components/RelatedNotes.astro";
 import { buildPrevNext, buildRelated, sortNotes } from "../../lib/notes";
 import { sitePath } from "../../lib/site-paths";
+import { cleanDisplayText } from "../../lib/display-text";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -25,9 +26,10 @@ const notes = sortNotes((await getCollection("notes")).filter((item) => !item.da
 const { previous, next } = buildPrevNext(notes, entry.slug);
 const relatedNotes = buildRelated(notes, entry);
 const reading = readingTime(entry.body);
+const displaySummary = cleanDisplayText(entry.data.summary);
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.summary} layout="reading">
+<BaseLayout title={entry.data.title} description={displaySummary} layout="reading">
   <section class="surface section article-frame">
     <Breadcrumbs
       items={[
@@ -42,7 +44,7 @@ const reading = readingTime(entry.body);
         <header class="article-header">
           <span class="eyebrow">{entry.data.categoryLabel}</span>
           <h1>{entry.data.title}</h1>
-          <p class="article-summary">{entry.data.summary}</p>
+          <p class="article-summary">{displaySummary}</p>
           <NoteMeta
             updated={entry.data.updated}
             readingTime={`约 ${Math.max(1, Math.round(reading.minutes))} 分钟`}

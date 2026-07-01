@@ -1,5 +1,6 @@
 ---
 import { sitePath } from "../lib/site-paths";
+import { cleanDisplayText } from "../lib/display-text";
 
 interface Props {
   href: string;
@@ -12,6 +13,7 @@ interface Props {
 
 const { href, title, summary, categoryLabel, updated, tags } = Astro.props;
 const visibleTags = tags.slice(0, 3);
+const displaySummary = cleanDisplayText(summary);
 ---
 
 <article class="note-card">
@@ -22,7 +24,7 @@ const visibleTags = tags.slice(0, 3);
   <h2 class="note-card-title">
     <a href={href}>{title}</a>
   </h2>
-  <p class="note-card-summary">{summary}</p>
+  <p class="note-card-summary">{displaySummary}</p>
   {visibleTags.length > 0 && (
     <div class="note-card-tags">
       {visibleTags.map((tag) => (

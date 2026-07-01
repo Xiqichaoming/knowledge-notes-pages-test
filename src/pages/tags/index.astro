@@ -4,6 +4,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import SectionIntro from "../../components/SectionIntro.astro";
 import { groupNotesByCategory, groupNotesByTag, sortNotes } from "../../lib/notes";
 import { sitePath } from "../../lib/site-paths";
+import { cleanDisplayText } from "../../lib/display-text";
 
 const notes = sortNotes((await getCollection("notes")).filter((entry) => !entry.data.draft));
 const categories = groupNotesByCategory(notes);
@@ -16,7 +17,7 @@ const tags = [...groupNotesByTag(notes)].sort(
   <SectionIntro
     eyebrow="标签"
     title="按标签聚合"
-    copy="标签主要服务于检索和横向串联。它们不替代分类结构，而是帮助你在不同专题之间找到相互指向的内容。"
+    copy="标签用于横向串联概念、工具和问题，适合在不同专题之间快速跳转"
   />
 
   <section class="overview-grid">
@@ -52,7 +53,7 @@ const tags = [...groupNotesByTag(notes)].sort(
               <span>{categoryCount} 个分类</span>
             </div>
             <strong>#{tag.label}</strong>
-            <p>{latestNote?.data.summary ?? "这个标签用于串联相关内容。"} </p>
+            <p>{cleanDisplayText(latestNote?.data.summary ?? "这个标签用于串联相关内容")} </p>
             {latestNote && <span class="tag-card-latest">最近出现于《{latestNote.data.title}》</span>}
           </a>
         );
