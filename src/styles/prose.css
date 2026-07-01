@@ -103,6 +103,8 @@
 .prose mark {
   padding: 0 0.12rem;
   border-radius: 4px;
+  background: rgba(245, 158, 11, 0.24);
+  color: inherit;
 }
 
 .prose .katex-display {
