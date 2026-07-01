@@ -78,10 +78,16 @@ npm run preview
 
 本站点部署到 GitHub Pages
 
+生产地址：
+
+```text
+https://Xiqichaoming.github.io/knowledge-notes/
+```
+
 当前 Astro 配置：
 
 - `site`: `https://Xiqichaoming.github.io`
-- `base`: `/knowledge-notes-pages-test`
+- `base`: `/knowledge-notes`
 - `output`: `static`
 
 GitHub Actions 工作流位于 `.github/workflows/deploy.yml`

@@ -5,7 +5,7 @@ summary: "Python 基础语法、注释、变量、分支与循环结构笔记。
 category: "python"
 categoryLabel: "Python Notes"
 tags: ["python", "syntax", "basics"]
-updated: "2026-06-30"
+updated: "2026-07-01"
 source: "Python/Python的基础语法.md"
 draft: false
 ---
@@ -43,7 +43,7 @@ Python作为动态类型语言，为变量分配了下面几种类型：
 7. tuple：元组类型
 8. set：集合类型
 9. None：唯一的空值类型
-Python使用“鸭子类型”作为设计的核心观念，遵从“一切都是对象”的方式来设计语言的数据结构，具体的内容在[探究Python的类型设计底层](/knowledge-notes-pages-test/notes/python-type-system/)中进一步探讨
+Python使用“鸭子类型”作为设计的核心观念，遵从“一切都是对象”的方式来设计语言的数据结构，具体的内容在[探究Python的类型设计底层](/knowledge-notes/notes/python-type-system/)中进一步探讨
 变量名由**字母**、**数字**和**下划线**构成，数字不能开头
 除了硬性规定的命名法则之外，Python还有一些别的惯例约束
 - ==变量、函数、方法、模块名使用小写蛇形命名法==，如`user_name`

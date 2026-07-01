@@ -5,7 +5,7 @@ summary: "围绕实验管理、迭代节奏和研究效率的工程化笔记。"
 category: "ai"
 categoryLabel: "AI Notes"
 tags: ["ai-engineering", "experiments", "workflow"]
-updated: "2026-06-30"
+updated: "2026-07-01"
 source: "AI知识库/工程技巧/怎么设计高效的AI实验项目.md"
 draft: false
 ---

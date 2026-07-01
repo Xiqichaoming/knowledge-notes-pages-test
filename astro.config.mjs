@@ -4,7 +4,7 @@ import rehypeKatex from "rehype-katex";
 
 export default defineConfig({
   site: "https://Xiqichaoming.github.io",
-  base: "/knowledge-notes-pages-test",
+  base: "/knowledge-notes",
   output: "static",
   markdown: {
     remarkPlugins: [remarkMath],

@@ -5,7 +5,7 @@ summary: "Transformer 论文的背景、结构与关键机制笔记。"
 category: "ai"
 categoryLabel: "AI Notes"
 tags: ["deep-learning", "transformer", "attention"]
-updated: "2026-06-30"
+updated: "2026-07-01"
 source: "AI知识库/Transformer.md"
 draft: false
 ---
@@ -20,7 +20,7 @@ Transformer对应的开创新论文是2017年6月份提交到Arxiv，然后被Ne
 自注意力机制本身是一个**关联单个序列不同位置**的操作机制，已经在Transformer之前就已经使用了
 
 ## 从结构开始分析
-![Pasted image 20260522170451.png](/knowledge-notes-pages-test/assets/Pasted%20image%2020260522170451.png)
+![Pasted image 20260522170451.png](/knowledge-notes/assets/Pasted%20image%2020260522170451.png)
 论文中上来就给出了一整个网络最核心的架构示意图，这个结构图中包含了许多的关键信息值得我们来分析
 
 ### Encoder-Decoder
@@ -36,7 +36,7 @@ Transformer对应的开创新论文是2017年6月份提交到Arxiv，然后被Ne
 具体来看最为核心的注意力设计部分。
 
 Transformer的注意力设计有两个部分：<mark style="background:#b1ffff">缩放点积注意力（Scaled Dot-Product Attention）</mark>和<mark style="background:#b1ffff">多头注意力（Multi-Head Attention）</mark>
-![Pasted image 20260522195833.png](/knowledge-notes-pages-test/assets/Pasted%20image%2020260522195833.png)上面这一张图就是缩放点积注意力的示意图。对于注意力机制来说，以往得到认同的注意力计算的思路是：
+![Pasted image 20260522195833.png](/knowledge-notes/assets/Pasted%20image%2020260522195833.png)上面这一张图就是缩放点积注意力的示意图。对于注意力机制来说，以往得到认同的注意力计算的思路是：
 - 定义一个Q（Query）向量表示一次查询时想要获取到的特征信息，用于表达关注序列中我们此时<mark style="background:rgba(205, 244, 105, 0.55)">想要的部分需要具有什么特性</mark>
 - 定义一个K（Key）向量表示一次查询时，序列的某一个单元<mark style="background:rgba(205, 244, 105, 0.55)">其本身现在具备了什么属性</mark>
 - 定义一个V（Value）向量表示一次查询时，序列的某一个单元<mark style="background:rgba(205, 244, 105, 0.55)">本身要提供的内容价值评估</mark>
@@ -48,20 +48,20 @@ Transformer的注意力设计有两个部分：<mark style="background:#b1ffff">
 Transformer的设计直接摒弃了编码器、解码器于QKV的绑定，让QKV的设计直接变成一个单独的模块设计，既可以存在于编码器，也可以存在于解码器中。
 
 在Transform中，缩放点积注意力是基于对序列单元化和向量化的基础上完成的：
-![Pasted image 20260522204307.png](/knowledge-notes-pages-test/assets/Pasted%20image%2020260522204307.png)
+![Pasted image 20260522204307.png](/knowledge-notes/assets/Pasted%20image%2020260522204307.png)
 
 在机器翻译任务中，输入的原始自然语言语句会经过Tokenizer（分词器）被拆分成多个词元的组合。Transformer使用Embedding层（词嵌入）将词元对应到指定的向量，组合之后一个句子的信息变成了一个$n \times d_{model}$的矩阵
 
-![Pasted image 20260524160110.png](/knowledge-notes-pages-test/assets/Pasted%20image%2020260524160110.png)
+![Pasted image 20260524160110.png](/knowledge-notes/assets/Pasted%20image%2020260524160110.png)
 这样一个矩阵就是我们提供给Transformer的原始输入。在不考虑多头的情况下，这个输入会分别与三个系数矩阵相乘，得到运算结果QKV三个矩阵。这里的矩阵相乘在网络中对应三个线性层。
 
-![Pasted image 20260524161417.png](/knowledge-notes-pages-test/assets/Pasted%20image%2020260524161417.png)
+![Pasted image 20260524161417.png](/knowledge-notes/assets/Pasted%20image%2020260524161417.png)
 紧接着，Q和K矩阵会直接进行矩阵乘法，然后使用$d_k$的算数平方根对结果进行缩放，并通过softmax之后与V矩阵再进行计算，最终输出Attention结果
 $$
 \text{Attention}(Q, K, V) = \mathrm{softmax}\left( \frac{Q K^\top}{\sqrt{d_k}} \right) V
 $$
 
-![Pasted image 20260524162831.png](/knowledge-notes-pages-test/assets/Pasted%20image%2020260524162831.png)
+![Pasted image 20260524162831.png](/knowledge-notes/assets/Pasted%20image%2020260524162831.png)
 而MHA（多头注意力）没有改变这个基础的思想。它只是将输入与一个矩阵相乘得到QKV的过程拆开了，Wq矩阵会被拆成多个子部分，每一个子部分按照上面的流程分别与X进行计算，完成计算之后再拼接到一起。比如在Transformer里，他们使用了8个头。那么原始的系数矩阵就相应的由$(x,d_{model})$变成了$(x,\frac{d_{model}}{8})$。相应的，中间所有的结果的第二维也是相应的变成了原来的八分之一。只在最后进行拼接还原到和不拆分时一样大小的矩阵。最后加上一个简单的线性层来完成拼接结果到最后结果的投影。
 $$
 \begin{align*} \text{MultiHead}(Q, K, V) &= \text{Concat}(\text{head}_1, ..., \text{head}_h) W^O \\ \text{where } \text{head}_i &= \text{Attention}(Q W_i^Q, K W_i^K, V W_i^V) \end{align*}
